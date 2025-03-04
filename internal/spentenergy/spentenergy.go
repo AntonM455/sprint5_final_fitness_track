@@ -1,6 +1,6 @@
 package spentenergy
 
-import ...
+import "time"
 
 // Основные константы, необходимые для расчетов.
 const (
@@ -28,8 +28,13 @@ const (
 // duration time.Duration — длительность тренировки.
 //
 // Создайте функцию ниже.
-...
+func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) float64 {
+	// вызываем функцию meanSpeed, чтобы посчитать среднюю скорость.
+	walkMeanSpead := MeanSpeed(steps, duration)
+	// Возвращаем кол-во потраченных калорий при ходьбе.
+	return ((walkingCaloriesWeightMultiplier * weight) + (walkMeanSpead*walkMeanSpead/height)*walkingSpeedHeightMultiplier) * duration.Hours() * minInH
 
+}
 
 // Константы для расчета калорий, расходуемых при беге.
 const (
@@ -46,8 +51,12 @@ const (
 // duration time.Duration — длительность тренировки.
 //
 // Создайте функцию ниже.
-...
-
+func RunningSpentCalories(steps int, weight float64, duration time.Duration) float64 {
+	// вызываем функцию meanSpeed, чтобы посчитать среднюю скорость
+	runMeanSpead := MeanSpeed(steps, duration)
+	// Возвращаем кол-во потраченных калорий при беге
+	return ((runningCaloriesMeanSpeedMultiplier * runMeanSpead) - runningCaloriesMeanSpeedShift) * weight
+}
 
 // МeanSpeed возвращает значение средней скорости движения во время тренировки.
 //
@@ -55,10 +64,14 @@ const (
 //
 // steps int — количество совершенных действий(число шагов при ходьбе и беге).
 // duration time.Duration — длительность тренировки.
-// 
+//
 // Создайте функцию ниже.
-...
-
+func MeanSpeed(steps int, duration time.Duration) float64 {
+	if duration <= 0 { // Проверяем, чтобы продолжительность не была равна 0
+		return 0
+	}
+	return Distance(steps) / duration.Hours() // Возвращаем среднюю скорость
+}
 
 // Distance возвращает дистанцию(в километрах), которую преодолел пользователь за время тренировки.
 //
@@ -66,8 +79,9 @@ const (
 // Параметры:
 //
 // steps int — количество совершенных действий (число шагов при ходьбе и беге).
-// 
+//
 // Создайте функцию ниже
-...
-
-
+func Distance(steps int) float64 {
+	distanceInKm := float64(steps) * lenStep / float64(mInKm)
+	return distanceInKm
+}
